@@ -3,7 +3,11 @@ import cv2
 import numpy as np
 import math
 import time
+import serial
 from sensor_msgs.msg import LaserScan
+
+#Communicaton série notamment pour la communcation Arduino
+ser = serial.Serial('/dev/ttyACM0', 9600,timeout=0)
 
 def moyenneDistLine(line):
     somme = 0
@@ -28,10 +32,11 @@ def printLine(line):
     '''-------------------------fin displayLine-------------------------'''
     
 def callback(data):
+    global ser
+    
     angle_ratio = 57.3005093379#114.601018676
     frame = np.zeros((500, 500,3), np.uint8)
     angle = data.angle_min
-    data.angle_min = 0
     #print data
 
     leftLine = []
@@ -42,6 +47,7 @@ def callback(data):
         #change infinite values to 0
         if math.isinf(r) == True:
             r = 0
+            
         #convert angle and radius to cartesian coordinates
         x = math.trunc((r * 30.0)*math.cos(angle + (-90.0*3.1416/180.0)))
         y = math.trunc((r * 30.0)*math.sin(angle + (-90.0*3.1416/180.0)))
@@ -53,16 +59,13 @@ def callback(data):
         elif angleDegre > -90 and angleDegre < -70 and r != 0 :
             leftLine.append(r)
 
-        #set the borders (all values outside the defined area should be 0)
-        if y > 0 or y < -35 or x<-40 or x>40:
-            x=0
-            y=0
-
         angle= angle + data.angle_increment
         #print(data.ranges[810])
         #time.sleep(0.1)
     '''-------------------------fin for-------------------------'''
-    
+
+
+     # Sinon on ne fait rien (l'arduino gère le mode manuel)
     print "RIGHTLINE"
     printLine(rightLine)
     print "----------------------------------------------------------------------"
@@ -76,10 +79,13 @@ def callback(data):
     print "minDistRight", minDistLineRight
     print "minDistLeft", minDistLineLeft
     if minDistLineRight < 0.4:
+        ser.write('L'.encode('utf-8'))
         print "turnLeft"
     elif minDistLineLeft < 0.4:
+        ser.write('R'.encode('utf-8'))
         print "turnRight"
     else:
+        ser.write('F'.encode('utf-8'))
         print "Forward"
     
     #print(data)
