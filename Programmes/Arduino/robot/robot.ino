@@ -51,6 +51,10 @@ void setup()
 
   // On démarre la réception sans fil.
   vw_rx_start();
+
+  //initialisation des leds
+  LEDS.addLeds<WS2812B,DATA_LED_PIN,RGB>(leds,NUM_LEDS);
+  LEDS.setBrightness(255);
 }
 
 // Boucle de notre programme, s'exécute en boucle.
@@ -153,13 +157,13 @@ void loop()
     }
 
     //
-    else ()
+    else
     {
       // Si la communication série est disponible.
       if (Serial.available())
       {
         // On récupère le message envoyé par la carte Raspberry Pi.
-        message = Serial.read();
+        byte message = Serial.read();
 
         // Si on reçoit l'ordre de faire avancer le robot.
         if (char(message) == 'F')
