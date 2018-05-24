@@ -1,6 +1,7 @@
 // On charge la librairie VirtualWire afin de pouvoir réaliser une communication
 // sans fil via notre récepteur 433MHz.
 #include <VirtualWire.h>
+#include "FastLED.h"
 
 // On défini les occurences dont on aura besoin.
 #define DIR_RIGHT 3
@@ -11,10 +12,17 @@
 #define PUL_B_LEFT 10
 #define SPEED 200
 
+//déclaration du nombre de led à controler
+//et du pin data utilisé pour les controler
+#define NUM_LEDS 300
+#define DATA_LED_PIN 7
+
+// Define the array of leds
+CRGB leds[NUM_LEDS];
+
 // On défini les variables dont on aura besoin pour la réception sans fil.
 uint8_t buf[VW_MAX_MESSAGE_LEN];
 uint8_t buflen = VW_MAX_MESSAGE_LEN;
-
 
 boolean automode = false;
 uint8_t i;
@@ -120,6 +128,14 @@ void loop()
         automode = true;
       }
     }
+
+    //Alumage des led en vert pour mode manuel
+    for(int i = 0; i < NUM_LEDS; i++) {
+      // Set the i'th led to red 
+      leds[i] = CRGB(0, 255, 0);
+      // Show the leds
+    }
+    FastLED.show();
   }
 
   // Si on est en mode automatique.
@@ -202,6 +218,15 @@ void loop()
         }
       }
     }
+    
+    //Allumage des led en rouge pour le mode autonome
+    //Alumage des led en vert pour mode manuel
+    for(int i = 0; i < NUM_LEDS; i++) {
+      // Set the i'th led to red 
+      leds[i] = CRGB(255, 0, 0);
+      // Show the leds
+    }
+    FastLED.show();
   }
 }
 
