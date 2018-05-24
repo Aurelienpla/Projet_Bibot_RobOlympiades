@@ -6,8 +6,8 @@ import time
 import serial
 from sensor_msgs.msg import LaserScan
 
-#Communicaton série notamment pour la communcation Arduino
-ser = serial.Serial('/dev/ttyACM0', 9600,timeout=0)
+#Communicaton serie notamment pour la communcation Arduino
+ser = serial.Serial('/dev/ttyAMA0', 9600,timeout=0)
 
 def moyenneDistLine(line):
     somme = 0
@@ -41,6 +41,7 @@ def callback(data):
 
     leftLine = []
     rightLine = []
+    frontLine = []
 
     for r in data.ranges:
         angleDegre = angle*angle_ratio
@@ -58,6 +59,8 @@ def callback(data):
             rightLine.append(r)
         elif angleDegre > -90 and angleDegre < -70 and r != 0 :
             leftLine.append(r)
+        elif angleDegre > -30 and angleDegre < 30 and r != 0 :
+            frontLine.append(r)
 
         angle= angle + data.angle_increment
         #print(data.ranges[810])
@@ -65,7 +68,7 @@ def callback(data):
     '''-------------------------fin for-------------------------'''
 
 
-     # Sinon on ne fait rien (l'arduino gère le mode manuel)
+     # Sinon on ne fait rien (l'arduino gere le mode manuel)
     print "RIGHTLINE"
     printLine(rightLine)
     print "----------------------------------------------------------------------"
@@ -76,9 +79,13 @@ def callback(data):
     
     minDistLineRight = minimumDistLine(rightLine)
     minDistLineLeft = minimumDistLine(leftLine)
+    minDistLineFront = minimumDistLine(frontLine)
     print "minDistRight", minDistLineRight
     print "minDistLeft", minDistLineLeft
-    if minDistLineRight < 0.4:
+    
+    if minDistLineFront < 0.2 :
+        print "Stop"
+    elif minDistLineRight < 0.4:
         ser.write('L'.encode('utf-8'))
         print "turnLeft"
     elif minDistLineLeft < 0.4:
