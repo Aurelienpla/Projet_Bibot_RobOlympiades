@@ -7,7 +7,7 @@ import serial
 from sensor_msgs.msg import LaserScan
 
 #Communicaton serie notamment pour la communcation Arduino
-ser = serial.Serial('/dev/ttyAMA0', 9600,timeout=0)
+ser = serial.Serial('/dev/ttyACM0', 9600,timeout=0)
 
 def moyenneDistLine(line):
     somme = 0
@@ -82,8 +82,9 @@ def callback(data):
     minDistLineFront = minimumDistLine(frontLine)
     print "minDistRight", minDistLineRight
     print "minDistLeft", minDistLineLeft
+    print "mindDistFront" , minDistLineFront
     
-    if minDistLineFront < 0.2 :
+    if minDistLineFront < 0.4 :
         print "Stop"
     elif minDistLineRight < 0.4:
         ser.write('L'.encode('utf-8'))
@@ -95,6 +96,7 @@ def callback(data):
         ser.write('F'.encode('utf-8'))
         print "Forward"
     
+    #time.sleep(0.5)
     #print(data)
     #time.sleep(2)
     #input("Press Enter to continue...")
