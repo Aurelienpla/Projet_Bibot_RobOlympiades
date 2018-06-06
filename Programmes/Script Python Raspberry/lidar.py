@@ -7,7 +7,10 @@ import serial
 from sensor_msgs.msg import LaserScan
 
 #Communicaton serie notamment pour la communcation Arduino
-ser = serial.Serial('/dev/ttyACM0', 9600,timeout=0)
+ser = serial.Serial('/dev/ttyACM0', 115200,timeout=0)
+time.sleep(1)               #on laisse un peu de temps pour l'initialisation du port serie
+lastTime = time.time()
+currentTime = time.time()
 
 def moyenneDistLine(line):
     somme = 0
@@ -33,6 +36,8 @@ def printLine(line):
     
 def callback(data):
     global ser
+    global lastTime
+    global currentTime
     
     angle_ratio = 57.3005093379#114.601018676
     frame = np.zeros((500, 500,3), np.uint8)
@@ -83,22 +88,29 @@ def callback(data):
     print "minDistRight", minDistLineRight
     print "minDistLeft", minDistLineLeft
     print "mindDistFront" , minDistLineFront
-    
-    if minDistLineFront < 0.4 :
-        print "Stop"
-    elif minDistLineRight < 0.4:
-        ser.write('L'.encode('utf-8'))
-        print "turnLeft"
-    elif minDistLineLeft < 0.4:
-        ser.write('R'.encode('utf-8'))
-        print "turnRight"
-    else:
-        ser.write('F'.encode('utf-8'))
-        print "Forward"
-    
+
+    currentTime = time.time()
+    if currentTime > lastTime + 0.4 :
+        if minDistLineFront < 0.4 :
+            ser.write('S'.encode('utf-8'))
+            print "Stop"
+        elif minDistLineRight < 0.4:
+            ser.write('L'.encode('utf-8'))
+            print "turnLeft"
+        elif minDistLineLeft < 0.4:
+            ser.write('R'.encode('utf-8'))
+            print "turnRight"
+        else:
+            ser.write('F'.encode('utf-8'))
+            print "Forward"
+            
+        lastTime = currentTime
+    else :
+        print "pas encore"
+        
     #time.sleep(0.5)
     #print(data)
-    #time.sleep(2)
+    #time.sleep(0.2)
     #input("Press Enter to continue...")
 '''-------------------------fin callback-------------------------'''
 
