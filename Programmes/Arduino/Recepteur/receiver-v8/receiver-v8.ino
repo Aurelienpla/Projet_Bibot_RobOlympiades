@@ -14,9 +14,9 @@
 #define PUL_B_LEFT 10
 #define SPEED 200
 #define STEPS 350
-#define NUM_LEDS 300
-#define BRIGHTNESS_LED 1
-#define DATA_LED_PIN 7
+#define NUM_LEDS 111
+#define BRIGHTNESS_LED 255
+#define DATA_LED_PIN 21
 
 #define BUF_SERIE_LENGTH 128
 
@@ -314,15 +314,15 @@ void moteur(int vitesse)
 // Fonction permettant de définir le sens des moteurs afin de faire avancer le robot.
 void forward()
 {
-  digitalWrite(DIR_RIGHT, HIGH);
-  digitalWrite(DIR_LEFT, LOW);
+  digitalWrite(DIR_RIGHT, LOW);
+  digitalWrite(DIR_LEFT, HIGH);
 }
 
 // Fonction permettant de définir le sens des moteurs afin de faire reculer le robot.
 void backward()
 {
-  digitalWrite(DIR_RIGHT, LOW);
-  digitalWrite(DIR_LEFT, HIGH);
+  digitalWrite(DIR_RIGHT, HIGH);
+  digitalWrite(DIR_LEFT, LOW);
 }
 
 // Fonction permettant de définir le sens des moteurs afin de faire tourner le robot vers la gauche.
